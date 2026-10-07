@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "frontend-slides",
-  "description": "Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files.",
+  "description": "国企商务版：生成风格稳重、只用本机字体、可离线放映的网页幻灯片，也能把已有 PPT 转成网页幻灯片。",
   "owner": {
     "name": "zqf",
     "url": "https://github.com/thu-cccm"
@@ -9,10 +9,17 @@
   "plugins": [
     {
       "name": "frontend-slides",
-      "description": "Zero-dependency HTML presentation generator with safe presets, bold template-library styles, PPT conversion, and anti-AI-slop design philosophy.",
+      "description": "国企商务版：生成风格稳重、只用本机字体、可离线放映的网页幻灯片，也能把已有 PPT 转成网页幻灯片。",
       "source": "./plugins/frontend-slides",
       "category": "productivity",
-      "tags": ["presentations", "slides", "html", "design", "powerpoint", "templates"]
+      "tags": [
+        "presentations",
+        "slides",
+        "html",
+        "powerpoint",
+        "chinese",
+        "business"
+      ]
     }
   ]
 }

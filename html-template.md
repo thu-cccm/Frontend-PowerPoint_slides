@@ -6,35 +6,42 @@ Reference architecture for generating slide presentations. Every presentation fo
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presentation Title</title>
 
-    <!-- Fonts: use Fontshare or Google Fonts — never system fonts -->
-    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=...">
+    <!-- 字体：只用本机字体（见 BUSINESS_STYLES.md 的字体规则）。
+         这里不能出现任何指向外网的 <link>、@import 或 @font-face。 -->
 
     <style>
         /* ===========================================
-           CSS CUSTOM PROPERTIES (THEME)
-           Change these to change the whole look
+           主题变量：改这里就能改整份幻灯片的颜色和字体
            =========================================== */
         :root {
-            /* Colors — from chosen style preset */
-            --bg-primary: #0a0f1c;
-            --bg-secondary: #111827;
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --accent: #00ffcc;
-            --accent-glow: rgba(0, 255, 204, 0.3);
+            /* 颜色：来自所选风格（示例为“藏青金”） */
+            --bg-primary: #1C2644;
+            --bg-secondary: #F0ECE3;
+            --text-primary: #E2DCD0;
+            --text-secondary: #8A96A8;
+            --accent: #C8A870;
 
-            /* Typography — authored at 1920×1080 stage size */
-            --font-display: 'Clash Display', sans-serif;
-            --font-body: 'Satoshi', sans-serif;
-            --title-size: 112px;
-            --subtitle-size: 34px;
-            --body-size: 28px;
+            /* 字体：三个变量原样照抄 BUSINESS_STYLES.md，不要改成网络字体 */
+            --font-sans: "Segoe UI", "Helvetica Neue", Arial,
+                         "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
+                         "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei", sans-serif;
+            --font-serif: Georgia, "Times New Roman",
+                          "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
+                          "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei", serif;
+            --font-mono: Consolas, "SF Mono", Menlo,
+                         "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
+                         "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei", monospace;
+
+            /* 字号：按 1920×1080 画布书写，不低于 BUSINESS_STYLES.md 的下限 */
+            --title-size: 64px;
+            --subtitle-size: 36px;
+            --body-size: 32px;
 
             /* Spacing — authored at 1920×1080 stage size */
             --slide-padding: 72px;
@@ -137,9 +144,15 @@ Reference architecture for generating slide presentations. Every presentation fo
                     slide.classList.toggle('visible', i === this.currentSlide);
                 });
             }
+
+            // 供检查脚本和导出脚本跳转页面使用，保留这个名字
+            goToSlide(index) {
+                this.showSlide(index);
+            }
         }
 
-        new SlidePresentation();
+        // 挂到 window 上，scripts/slides.mjs 截图时会调用 window.presentation.goToSlide()
+        window.presentation = new SlidePresentation();
     </script>
 </body>
 </html>
@@ -160,18 +173,16 @@ Every presentation must include:
    - Scale the whole stage with one transform
    - Letterbox/pillarbox as needed; never reflow slide content per device
 
-3. **Optional Enhancements** (match to chosen style):
-   - Custom cursor with trail
-   - Particle system background (canvas)
-   - Parallax effects
-   - 3D tilt on hover
-   - Magnetic buttons
-   - Counter animations
+3. **页码**：除封面外，每页右下角显示“当前页 / 总页数”，写在页面内部（`.slide` 里面），这样导出 PDF 时也能看到。
 
-4. **Inline Editing** (included by default after draft generation):
+4. **动画与特效（国企商务版）**：
+   - 可以用：页面切换时的淡入、轻微上移；数据页的数字递增动画
+   - 不要用：自定义光标、粒子背景、视差滚动、3D 倾斜、磁吸按钮、闪烁或霓虹发光
+
+5. **Inline Editing** (included by default after draft generation):
    - Edit toggle button (hidden by default, revealed via hover hotzone or `E` key)
    - Auto-save to localStorage
-   - Export/save file functionality
+   - Save-to-file with Ctrl+S
    - See "Inline Editing Implementation" section below
 
 ## Inline Editing Implementation
@@ -254,6 +265,15 @@ document.addEventListener('keydown', (e) => {
     }
 });
 ```
+
+### 保存规则（必须照做）
+
+用户按 E 改完文字后，改动要能留住，而且不能和 AI 之后的修改打架：
+
+1. **自动暂存**：改动保存在 `localStorage`，键名包含文件路径（`location.pathname`），避免同一台电脑上的多份幻灯片互相覆盖。
+2. **防止旧改动盖住新版本**：页面加载时，先算出原始页面内容的指纹（例如对 `.deck-stage` 的 `innerHTML` 做一个简单哈希），和暂存的改动一起保存。下次加载时，指纹一致才恢复暂存的改动；不一致说明文件已经被 AI 改过，直接丢弃旧的暂存。
+3. **Ctrl+S 保存成文件**：拦截浏览器默认的“网页另存为”，先退出编辑模式、去掉所有 `contenteditable` 属性，再把当前整个页面（`document.documentElement.outerHTML`，前面补上 `<!DOCTYPE html>`）作为文件下载，文件名和原文件相同。下载后在页面上提示一句：“已保存到‘下载’文件夹，用它替换原文件即可。”
+4. 所有 `localStorage` 读写都放在 `try/catch` 里，失败时不影响放映。
 
 ## Image Pipeline (Skip If No Images)
 

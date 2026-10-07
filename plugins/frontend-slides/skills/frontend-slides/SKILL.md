@@ -1,380 +1,197 @@
 ---
 name: frontend-slides
-description: Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PPT/PPTX to web, or create slides for a talk/pitch. Helps non-designers discover their aesthetic through visual exploration rather than abstract choices.
+description: 制作国企商务风格的网页幻灯片（在浏览器里放映的 HTML 演示文稿），也能把已有的 PPT 转成网页幻灯片。用户要做汇报、方案介绍、讲解用的 PPT、幻灯片、演示文稿时使用。风格稳重，只用本机字体，单位内网也能离线放映。Use for presentations, slides, PPT, decks.
 ---
 
-# Frontend Slides
+# 网页幻灯片（国企商务版）
 
-Create zero-dependency, animation-rich HTML presentations that run entirely in the browser.
-
-## Core Principles
-
-1. **Zero Dependencies** — Single HTML files with inline CSS/JS. No npm, no build tools.
-2. **Show, Don't Tell** — Generate visual previews, not abstract choices. People discover what they want by seeing it.
-3. **Distinctive Design** — No generic "AI slop." Every presentation must feel custom-crafted.
-4. **Progressive Disclosure** — Read lightweight style indexes first. For bold templates, use small preview cards for style previews and load the full `design.md` only after the user picks that template.
-5. **Fixed 16:9 Stage (NON-NEGOTIABLE)** — Every deck uses a 1920×1080 slide canvas scaled as a whole to the viewport. Slides must stay 16:9 on every screen, including phones. Do not reflow slide content to fit the device.
-
-## Design Aesthetics
-
-You tend to converge toward generic, "on distribution" outputs. In frontend design, this creates what users call the "AI slop" aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.
-
-Focus on:
-
-- Typography: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics.
-- Color & Theme: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes. Draw from IDE themes and cultural aesthetics for inspiration.
-- Motion: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions.
-- Backgrounds: Create atmosphere and depth rather than defaulting to solid colors. Layer CSS gradients, use geometric patterns, or add contextual effects that match the overall aesthetic.
-
-Avoid generic AI-generated aesthetics:
-
-- Overused font families (Inter, Roboto, Arial, system fonts)
-- Cliched color schemes (particularly purple gradients on white backgrounds)
-- Predictable layouts and component patterns
-- Cookie-cutter design that lacks context-specific character
-
-Interpret creatively and make unexpected choices that feel genuinely designed for the context. Vary between light and dark themes, different fonts, different aesthetics. You still tend to converge on common choices (Space Grotesk, for example) across generations. Avoid this: it is critical that you think outside the box!
-
-## Fixed Stage Rules
-
-These invariants apply to EVERY slide in EVERY presentation:
-
-- Every deck has a viewport wrapper that fills the browser window.
-- Every slide is authored inside a fixed 1920×1080 stage.
-- The stage scales uniformly to fit the viewport. It may letterbox/pillarbox; it must not re-layout content.
-- Do not use responsive breakpoints to rearrange slide content for phones.
-- Use fixed internal slide measurements at the 1920×1080 design size.
-- Slide visibility must be controlled by `.active` / `.visible` using `visibility`, `opacity`, and `pointer-events` from `viewport-base.css`. Do not use `display: none` / `display: block` for slide switching; later layout classes such as `.slide-content { display: flex; }` can override them and make every slide visible at once.
-- Use `clamp()` only for non-slide UI outside the stage, or for small fallback previews where a full stage is impractical.
-- Include `prefers-reduced-motion` support
-- Never negate CSS functions directly (`-clamp()`, `-min()`, `-max()` are silently ignored) — use `calc(-1 * clamp(...))` instead
-
-**When generating, read `viewport-base.css` and include its full contents in every presentation.**
-
-### Content Density Modes
-
-Ask the user whether this is primarily a reading deck or a speaking deck, then design around that answer:
-
-| Density mode | Best for | Design behavior |
-| ------------- | -------- | --------------- |
-| **Low density / speaker-led** | Public talks, keynote-style sharing, live explanation | One idea per slide, large type, strong visual hierarchy, generous negative space, 1-3 bullets max, more slides if needed |
-| **High density / reading-first** | Reports, handouts, async review, detailed internal docs | More self-contained slides, structured grids/tables/annotations, 4-8 bullets or 4-6 cards when readable, tighter but still intentional spacing |
-
-Baseline limits still apply: no scrolling, no overflow, no overlapping panels, and no text below comfortable reading size. If content exceeds the selected density mode, split it into more slides instead of shrinking until it becomes cramped.
+本技能生成的是**在浏览器里放映的网页幻灯片**：一个 `.html` 文件，双击就能打开，按方向键翻页，主要用于用户自己现场讲解。需要发给别人时，可以导出成 PDF。
 
 ---
 
-## Phase 0: Detect Mode
+## 我的偏好设置（可以直接修改这一节）
 
-Determine what the user wants:
+AI 每次开始工作前先读这一节。把“未指定”“未填写”改成具体内容，下次就会自动生效，不再重复询问。
 
-- **Mode A: New Presentation** — Create from scratch. Go to Phase 1.
-- **Mode B: PPT Conversion** — Convert a .pptx file. Go to Phase 4.
-- **Mode C: Enhancement** — Improve an existing HTML presentation. Read it, understand it, enhance. **Follow Mode C modification rules below.**
-
-### Mode C: Modification Rules
-
-When enhancing existing presentations, fixed-stage fitting is the biggest risk:
-
-1. **Before adding content:** Count existing elements, check against density limits
-2. **Adding images:** Fit them inside the 1920×1080 slide canvas. If slide already has max content, split into two slides
-3. **Adding text:** Max 4-6 bullets per slide. Exceeds limits? Split into continuation slides
-4. **After ANY modification, verify:** the slide stage remains 16:9, no text overflows its card, no panels overlap, and screenshots look correct at 1280×720 plus one phone viewport
-5. **Proactively reorganize:** If modifications will cause overflow, automatically split content and inform the user. Don't wait to be asked
-
-**When adding images to existing slides:** Move image to a new slide or reduce other content first. Never add images without checking if existing content already fills the 1920×1080 slide stage.
+- **默认风格**：未指定（每次从稳重风格里给 3 个预览让我选；想固定一套，就写上它的中文名，例如“藏青金”）
+- **演示方式**：自己现场讲解（每页字少、字大，一页讲清一个观点）
+- **单位/部门名称**：未填写（填写后显示在封面和页脚）
+- **单位主色**：未填写（例如“#C00000”；填写后替换所选风格的强调色）
+- **其他要求**：无
 
 ---
 
-## Phase 1: Content Discovery (New Presentations)
+## 必须遵守的六条规则
 
-**Ask ALL questions together** so the user fills everything out at once. If the current environment provides a native structured-question UI, use it; otherwise ask in one concise message with clearly numbered choices:
-
-**Question 1 — Purpose** (header: "Purpose"):
-What is this presentation for? Options: Pitch deck / Teaching-Tutorial / Conference talk / Internal presentation
-
-**Question 2 — Length** (header: "Length"):
-Approximately how many slides? Options: Short 5-10 / Medium 10-20 / Long 20+
-
-**Question 3 — Content** (header: "Content"):
-Do you have content ready? Options: All content ready / Rough notes / Topic only
-
-**Question 4 — Density** (header: "Density"):
-How dense should the deck feel? Options:
-
-- "Low density / speaker-led" — Big ideas, fewer words, more visual breathing room
-- "High density / reading-first" — More self-contained detail for async reading
-
-**Do not ask about inline editing during Phase 1.** Users should not have to choose editing behavior before seeing a draft. Inline editing is a post-draft affordance: include it by default unless the user explicitly asks for a locked/export-only file.
-
-Remember the user's density choice. It affects slide count, typography scale, amount of text per slide, layout density, and whether to favor cinematic presenter slides or self-contained reading slides.
-
-If user has content, ask them to share it.
-
-### Step 1.2: Image Evaluation (if images provided)
-
-If user selected "No images" → skip to Phase 2.
-
-If user provides an image folder:
-
-1. **Scan** — List all image files (.png, .jpg, .svg, .webp, etc.)
-2. **Inspect each image** — Use the agent's available image-understanding capability. If image reading is unavailable, use filenames/metadata and ask the user to clarify only when needed
-3. **Evaluate** — For each: what it shows, USABLE or NOT USABLE (with reason), what concept it represents, dominant colors
-4. **Co-design the outline** — Curated images inform slide structure alongside text. This is NOT "plan slides then add images" — design around both from the start (e.g., 3 screenshots → 3 feature slides, 1 logo → title/closing slide)
-5. **Confirm the outline** using the same structured-question mechanism when available: "Does this slide outline and image selection look right?" Options: Looks good / Adjust images / Adjust outline
-
-**Logo in previews:** If a usable logo was identified, embed it (base64) into each style preview in Phase 2 — the user sees their brand styled three different ways.
+1. **只用稳重风格。** 所有风格从 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 里选，不使用其他风格，不自由发挥出花哨的设计。
+2. **完全离线可放映。** 不从网上加载任何字体、图片、脚本或样式（包括 Google Fonts、Fontshare 和各种 CDN）。字体按 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 的「字体规则」使用本机字体。
+3. **不编造事实。** 数字、金额、比例、客户名称、项目案例、政策文件、日期，只能来自用户提供的材料。缺少时在页面上写明显的占位符，例如 `【待补充：2025 年签约金额】`，用强调色虚线框标出，交付时逐条列给用户。
+4. **不对外发布。** 不把幻灯片部署到任何网站，不上传到网盘或其他外部服务。文件只保存在用户自己的电脑上。
+5. **固定 16:9 画布。** 每页按 1920×1080 设计，整体缩放适配屏幕，不因屏幕大小重新排版（详见下方「固定画布规则」）。
+6. **投屏看得清。** 遵守 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 的字号下限。内容放不下就拆成两页，不要缩小字号或挤在一起。
 
 ---
 
-## Phase 2: Style Discovery
+## 内容写法
 
-**This is the "show, don't tell" phase.** Most people can't articulate design preferences in words.
+- **标题写结论，不写话题。** 例如不写“项目进展”，写“三季度完成主体建设，进度领先计划两周”。听众只看标题也能抓住重点。
+- **现场讲解型（默认）**：一页一个观点，要点不超过 4 条，每条不超过 25 个字，详细内容留给口头讲解。
+- **阅读型**（仅当用户说要发给别人自己看时）：每页内容更完整，可以用表格、分栏、图注，要点不超过 6 条。
+- 语言正式、简洁，用书面语；不用网络用语和表情符号；少用空泛的套话，多用具体事实。
+- 除封面外，每页右下角显示页码，方便答疑时说“请看第 5 页”。
 
-### Step 2.0: Generate 3 Style Previews Directly
+常用结构可供参考：
 
-Based on purpose, audience, mood, and content density, generate 3 distinct single-slide HTML previews showing typography, colors, animation, and overall aesthetic.
+| 类型 | 推荐顺序 |
+|---|---|
+| 工作汇报 | 背景与目标 → 主要成果 → 存在问题 → 下一步计划 |
+| 方案介绍 | 客户需求 → 解决方案 → 价值收益 → 实施计划 → 合作建议 |
+| 公司或产品介绍 | 我们是谁 → 核心能力 → 典型案例 → 合作方式 |
 
-Do not ask the user whether they want options or a preset picker. The default discovery experience is always visual comparison.
-
-If the user already gave a vibe, use it. If they did not, infer the likely mood from the occasion, audience, content, and stakes. Keep the options diverse enough that the user can react visually instead of needing to articulate taste up front.
-
-If the user explicitly names a preset or bold template, honor that as one option and generate the remaining preview slots around it.
-
-Read [STYLE_PRESETS.md](STYLE_PRESETS.md) for safe preset candidates. If [bold-template-pack/selection-index.json](bold-template-pack/selection-index.json) exists, read that compact index too, but do not read any `design.md` files yet.
-
-| Mood                | Suggested Presets                                  |
-| ------------------- | -------------------------------------------------- |
-| Impressed/Confident | Bold Signal, Electric Studio, Dark Botanical       |
-| Excited/Energized   | Creative Voltage, Neon Cyber, Split Pastel         |
-| Calm/Focused        | Notebook Tabs, Paper & Ink, Swiss Modern           |
-| Inspired/Moved      | Dark Botanical, Vintage Editorial, Pastel Geometry |
-
-**Preview mix rules:**
-
-- Generate 3 previews by default: 1 safe preset from `STYLE_PRESETS.md`, at least 1 bold template from `bold-template-pack/selection-index.json`, and 1 wildcard.
-- The wildcard may be either a second bold template or a self-generated custom design. Choose whichever creates the strongest, most useful contrast for the user's occasion, audience, mood, and content.
-- Do not force every expressive option to come from the template library. If the brief has a sharper, more specific design opportunity than the available templates, use the wildcard slot to design freely.
-- For conservative or high-stakes decks, make the safe preset especially restrained; choose a calm, higher-formality bold template; make the wildcard either another restrained template or a custom design that feels authoritative rather than decorative.
-- For expressive decks, keep the safe preset as a readable fallback; choose one strong bold template; make the wildcard adventurous, context-specific, and clearly different from both other previews.
-- If bold template matches feel weak, use the wildcard as a custom design or fall back to another safe preset instead of forcing a template.
-
-**Custom wildcard design rules:**
-
-- Follow the Design Aesthetics section above: no generic "AI slop", no default font/color/layout choices, no purple-gradient-on-white clichés, no cookie-cutter dashboard/card look.
-- Match the user's stated occasion, audience, mood/vibe, and content density. The custom design should feel authored for this deck, not merely "stylish."
-- Make a deliberate visual thesis: distinctive typography, a committed palette, a recognizable layout system, and one strong atmospheric or graphic device.
-- Keep it feasible for a full deck. The preview must imply a design system that can expand into section, content, quote, comparison, and closing slides.
-- Use fixed 1920×1080 stage rules and pass the same preview authenticity checks as every other option.
-- Never render "custom", "wildcard", "AI-generated", or design-process labels on the slide itself.
-
-**Bold template selection rules:**
-
-- Match user purpose and mood against `mood`, `tone`, `best_for`, `avoid_for`, `formality`, `density`, and `scheme`.
-- Treat `best_for` examples as soft signals, not strict industry filters.
-- Keep the three previews genuinely different from each other.
-- After choosing bold template candidate(s), read only those candidate(s)' `preview.md` files from the `preview_md` paths in the selection index.
-- Use `preview.md` only for title-slide previews. Do not read full `design.md` files until the user picks the final template.
-- Do not read or copy `template.html` unless the selected final `design.md` is missing a critical implementation detail.
-
-**Preview authenticity rules (NON-NEGOTIABLE):**
-
-- Every style preview must look like a real first slide from the user's deck, not a diagnostic card.
-- Never render internal workflow text on a slide: no `preview`, `generated from`, `preview.md`, `template`, `preset`, `style option`, `Option A/B/C`, file names, paths, or source-doc labels.
-- Never render template names or slug names on the slide itself. Template/style names belong only in the message to the user.
-- Never render user requirement notes as slide content, such as "sharp and provocative", "safe option", "bold option", "for internal sharing", or "audience: ...", unless the user explicitly wants that exact phrase to appear in the deck.
-- If the slide needs chrome, use real deck chrome only: the deck title, section title, date, author, company, page number, or a genuine content phrase from the user's material.
-- Before opening previews, inspect the visible text and revise if any internal metadata appears.
-
-Save previews to `.frontend-slides/slide-previews/` (style-a.html, style-b.html, style-c.html). Each should be self-contained and compact, showing one animated title slide.
-
-Open each preview automatically for the user.
-
-### Step 2.1: User Picks
-
-Ask (header: "Style"):
-Which style preview do you prefer? Options: Style A: [Name] / Style B: [Name] / Style C: [Name] / Mix elements
-
-If "Mix elements", ask for specifics.
+页面类型：封面、目录、章节页、内容页、数据页、总结页、结束页（致谢或联系方式）。
 
 ---
 
-## Phase 3: Generate Presentation
+## 工作流程
 
-Generate the full presentation using content from Phase 1 (text, or text + curated images) and style from Phase 2.
+### 第 0 步：判断任务类型
 
-If images were provided, the slide outline already incorporates them from Step 1.2. If not, CSS-generated visuals (gradients, shapes, patterns) provide visual interest — this is a fully supported first-class path.
+- **新做一份幻灯片** → 从第 1 步开始
+- **把已有的 PPT 转成网页幻灯片** → 跳到「PPT 转换」
+- **修改已有的网页幻灯片** → 先读文件，再按「修改规则」操作
 
-Apply the user's density choice throughout the deck:
+### 第 1 步：了解需求，一次问完
 
-- **Low density / speaker-led:** Use more slides with fewer ideas per slide. Favor large headings, short phrases, visual metaphors, section beats, quote/statement slides, and presenter-friendly pacing.
-- **High density / reading-first:** Make slides more self-contained. Use structured grids, comparison tables, annotated diagrams, captions, and concise explanatory copy. Keep hierarchy strong so it feels designed, not like a document pasted onto slides.
+用一条消息、带编号地问完下面几件事。用户已经说过的、偏好设置里已经写了的，不要重复问：
 
-If the user's stated needs are mixed, choose the closer of the two modes instead of inventing a middle option: live audience persuasion defaults low-density; async circulation or detailed review defaults high-density.
+1. 给谁讲？想达到什么目的？
+2. 大约几页，或者要讲多长时间？
+3. 内容素材在哪里：已经写好的内容、提纲、资料文件，还是只有一个题目？
+4. 有没有要放的图片或 Logo？如果有，放在哪个文件夹？
 
-Never let high density become visual clutter. If a high-density slide starts to overflow, split it or redesign it into a clearer structure.
+演示方式默认按偏好设置处理；只有用户明确说要发给别人阅读时，才改为阅读型。
 
-If the user selected a bold template from `bold-template-pack`, read that one template's full `design.md` before generating. Do not read the other bold templates. Treat `design.md` as the design recipe:
+### 第 2 步：先给大纲，确认后再做
 
-- Preserve its fonts, palette, decorative vocabulary, spacing rhythm, and component grammar.
-- Generate the final deck as a fixed 1920×1080 stage scaled uniformly to the viewport, regardless of whether the source template originally used `deck-stage.js` or viewport-fluid CSS.
-- Treat viewport-fluid values in `design.md` as design proportions to translate into 1920×1080 stage coordinates. Do not keep them as live viewport reflow rules in the final deck.
-- Keep the output as a single self-contained Frontend Slides HTML file.
-- Do not copy demo slide content or mimic the source template too literally.
-- Use `template.html` only as a last-resort implementation reference for the selected template.
-- After generating, verify both content overflow and panel overlap in rendered browser screenshots. `scrollHeight` checks alone are not enough because grid panels can visually cover each other.
+根据素材写出大纲：每页的标题（结论句）和 2–4 个要点，缺资料的地方标出【待补充】。把大纲发给用户确认，用户说可以之后再进入下一步。大纲不对时修改大纲，不要直接开始做页面。
 
-If the user selected a self-generated custom wildcard, treat that preview's CSS and layout as the design recipe:
+如果用户提供了图片：逐张查看内容，判断能不能用、适合放在哪一页，和大纲一起设计，并在大纲中注明每张图放在哪一页。
 
-- Preserve its fonts, palette, decorative vocabulary, spacing rhythm, grid logic, and component grammar.
-- Expand the same visual system across the full deck. Do not switch to a preset or bold template after the user has chosen the custom direction.
-- Design any missing slide layouts from that system rather than importing patterns from another style.
-- Keep the output fixed-stage, single-file, and visually verified like every other deck.
+### 第 3 步：确定风格
 
-**Before generating, read these supporting files:**
+- **偏好设置里写了默认风格**：直接使用，跳过预览。
+- **没有写**：从 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 里挑 3 套最合适的，各做一页封面预览，分别保存为 `.frontend-slides/slide-previews/style-a.html`、`style-b.html`、`style-c.html`，在浏览器中打开，请用户按中文名选择。选好后提醒用户：如果以后都用这一套，可以写进偏好设置。
 
-- [html-template.md](html-template.md) — HTML architecture and JS features
-- [viewport-base.css](viewport-base.css) — Mandatory CSS (include in full)
-- [animation-patterns.md](animation-patterns.md) — Animation reference for the chosen feeling
+预览页的要求：
 
-**Key requirements:**
+- 必须像这份幻灯片真正的封面：使用用户的真实标题、单位、日期。
+- 页面上不能出现任何内部字样，例如“预览”“风格 A”“模板”、风格英文名、文件名、路径，或者“稳重”“给领导看”这类需求描述。风格名称只在对话里告诉用户。
+- 只为预览读取所选风格在清单中的描述；模板库风格可以读它的 `preview.md`，但用户选定之前不要读完整的 `design.md`。
 
-- Single self-contained HTML file, all CSS/JS inline
-- Include the FULL contents of viewport-base.css in the `<style>` block
-- Use fonts from Fontshare or Google Fonts — never system fonts
-- Add detailed comments explaining each section
-- Every section needs a clear `/* === SECTION NAME === */` comment block
+### 第 4 步：生成幻灯片
 
----
+生成前先读：
 
-## Phase 4: PPT Conversion
+- [html-template.md](html-template.md)：网页结构和翻页、编辑等功能
+- [viewport-base.css](viewport-base.css)：固定画布样式，**必须完整复制进每份幻灯片**
+- [animation-patterns.md](animation-patterns.md)：只使用淡入、轻微上移这类克制的动画
+- 所选风格如果有 `design.md`，只读这一份：保留它的配色、版式、装饰元素和组件，字体按清单里的「字体映射」替换
 
-When converting PowerPoint files:
+生成要求：
 
-1. **Extract content** — Run `python scripts/extract-pptx.py <input.pptx> <output_dir>` (install python-pptx if needed: `pip install python-pptx`)
-2. **Confirm with user** — Present extracted slide titles, content summaries, and image counts
-3. **Style selection** — Proceed to Phase 2 for style discovery
-4. **Generate HTML** — Convert to chosen style, preserving all text, images (from assets/), slide order, and speaker notes (as HTML comments)
+- 一个独立的 `.html` 文件，所有样式和脚本都写在文件内部，`<html lang="zh-CN">`。
+- 关键位置写中文注释，说明怎么改颜色、字体和文字，方便用户以后自己改。
+- 默认包含“按 E 键直接改字”的编辑功能（见 html-template.md）。
+- 填写了单位名称时，显示在封面和页脚；填写了单位主色时，按 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 的「单位主色」处理。
+- 保存在用户当前的工作文件夹，文件名用简短的中文或英文，不含空格，例如 `客户方案汇报.html`；有图片时放在同目录的 `assets/` 文件夹里，用相对路径引用。
 
----
+### 第 5 步：检查版面（必须做）
 
-## Phase 5: Delivery
+在终端运行检查脚本（脚本在本技能文件夹的 `scripts/` 里，和这份 SKILL.md 在同一个目录下）：
 
-1. **Clean up** — Delete `.frontend-slides/slide-previews/` if it exists
-2. **Open** — Use `open [filename].html` to launch in browser
-3. **Summarize** — Tell the user:
-   - File location, style name, slide count
-   - Navigation: Arrow keys, Space, swipe/tap if enabled
-   - How to customize: `:root` CSS variables for colors, font link for typography, `.reveal` class for animations
-   - Inline text editing is available: Hover top-left corner or press E to enter edit mode, click any text to edit, Ctrl+S to save
-   - Offer the natural post-draft actions: ask for revisions, edit text directly in the browser, or export/share
+```bash
+node <本技能文件夹>/scripts/slides.mjs check <幻灯片文件.html>
+```
 
----
+脚本会逐页截图，保存在幻灯片旁边的 `.frontend-slides/check/` 文件夹里，并列出发现的问题：文字超出页面、文字被裁切、文字溢出卡片、文字互相重叠、字号过小、疑似空白页、中文没有用本机字体、引用了外网资源、页面脚本报错。检查时会拦截所有外网请求，截图效果和在断网的会议室里放映一致。
 
-## Phase 6: Share & Export (Optional)
+然后：
 
-After delivery, **ask the user:** _"Would you like to share this presentation? I can deploy it to a live URL (works on any device including phones) or export it as a PDF."_
+1. 按报告逐条修改。
+2. 打开截图逐页查看，重点看：内容是否拥挤、对齐是否整齐、文字和背景颜色对比是否清楚、有没有空白页或错位。
+3. 修改后重新运行检查，最多 3 轮。仍有解决不了的问题，交付时如实告诉用户在第几页。
 
-Options:
+如果脚本无法运行，先按「环境准备」处理；仍然不行，就请用户在浏览器里逐页翻看，告诉用户重点检查上面这几项。
 
-- **Deploy to URL** — Shareable link that works on any device
-- **Export to PDF** — Universal file for email, Slack, print
-- **Both**
-- **No thanks**
+### 第 6 步：交付
 
-If the user declines, stop here. If they choose one or both, proceed below.
-
-### 6A: Deploy to a Live URL (Vercel)
-
-This deploys the presentation to Vercel — a free hosting platform. The link works on any device (phones, tablets, laptops) and stays live until the user takes it down.
-
-**If the user has never deployed before, guide them step by step:**
-
-1. **Check if Vercel CLI is installed** — Run `npx vercel --version`. If not found, install Node.js first (`brew install node` on macOS, or download from https://nodejs.org).
-
-2. **Check if user is logged in** — Run `npx vercel whoami`.
-   - If NOT logged in, explain: _"Vercel is a free hosting service. You need an account to deploy. Let me walk you through it:"_
-     - Step 1: Ask user to go to https://vercel.com/signup in their browser
-     - Step 2: They can sign up with GitHub, Google, email — whatever is easiest
-     - Step 3: Once signed up, run `vercel login` and follow the prompts (it opens a browser window to authorize)
-     - Step 4: Confirm login with `vercel whoami`
-   - Wait for the user to confirm they're logged in before proceeding.
-
-3. **Deploy** — Run the deploy script:
-
-   ```bash
-   bash scripts/deploy.sh <path-to-presentation>
-   ```
-
-   The script accepts either a folder (with index.html) or a single HTML file.
-
-4. **Share the URL** — Tell the user:
-   - The live URL (from the script output)
-   - That it works on any device — they can text it, Slack it, email it
-   - To take it down later: visit https://vercel.com/dashboard and delete the project
-   - The Vercel free tier is generous — they won't be charged
-
-**⚠ Deployment gotchas:**
-
-- **Local images/videos must travel with the HTML.** The deploy script auto-detects files referenced via `src="..."` in the HTML and bundles them. But if the presentation references files via CSS `background-image` or unusual paths, those may be missed. **Before deploying, verify:** open the deployed URL and check that all images load. If any are broken, the safest fix is to put the HTML and all its assets into a single folder and deploy the folder instead of a standalone HTML file.
-- **Prefer folder deployments when the presentation has many assets.** If the presentation lives in a folder with images alongside it (e.g., `my-deck/index.html` + `my-deck/logo.png`), deploy the folder directly: `bash scripts/deploy.sh ./my-deck/`. This is more reliable than deploying a single HTML file because the entire folder contents are uploaded as-is.
-- **Filenames with spaces work but can cause issues.** The script handles spaces in filenames, but Vercel URLs encode spaces as `%20`. If possible, avoid spaces in image filenames. If the user's images have spaces, the script handles it — but if images still break, renaming files to use hyphens instead of spaces is the fix.
-- **Redeploying updates the same URL.** Running the deploy script again on the same presentation overwrites the previous deployment. The URL stays the same — no need to share a new link.
-
-### 6B: Export to PDF
-
-This captures each slide as a screenshot and combines them into a PDF. Perfect for email attachments, embedding in documents, or printing.
-
-**Note:** Animations and interactivity are not preserved — the PDF is a static snapshot. This is normal and expected; mention it to the user so they're not surprised.
-
-1. **Run the export script:**
-
-   ```bash
-   bash scripts/export-pdf.sh <path-to-html> [output.pdf]
-   ```
-
-   If no output path is given, the PDF is saved next to the HTML file.
-
-2. **What happens behind the scenes** (explain briefly to the user):
-   - A headless browser opens the presentation at 1920×1080 (standard widescreen)
-   - It screenshots each slide one by one
-   - All screenshots are combined into a single PDF
-   - The script needs Playwright (a browser automation tool) — it will install automatically if missing
-
-3. **If Playwright installation fails:**
-   - The most common issue is Chromium not downloading. Run: `npx playwright install chromium`
-   - If that fails too, it may be a network/firewall issue. Ask the user to try on a different network.
-
-4. **Deliver the PDF** — The script auto-opens it. Tell the user:
-   - The file location and size
-   - That it works everywhere — email, Slack, Notion, Google Docs, print
-   - Animations are replaced by their final visual state (still looks great, just static)
-
-**⚠ PDF export gotchas:**
-
-- **First run is slow.** The script installs Playwright and downloads a Chromium browser (~150MB) into a temp directory. This happens once per run. Warn the user it may take 30-60 seconds the first time — subsequent exports within the same session are faster.
-- **Slides must use `class="slide"`.** The export script finds slides by querying `.slide` elements. If the presentation uses a different class name, the script will report "0 slides found" and fail. All presentations generated by this skill use `.slide`, so this only matters for externally-created HTML.
-- **Local images must be loadable via HTTP.** The script starts a local server and loads the HTML through it (so Google Fonts and relative image paths work). If images use absolute filesystem paths (e.g., `src="/Users/name/photo.png"`) instead of relative paths (e.g., `src="photo.png"`), they won't load. Generated presentations always use relative paths, but converted or user-provided decks might not — check and fix if needed.
-- **Local images appear in the PDF** as long as they are in the same directory as (or relative to) the HTML file. The export script serves the HTML's parent directory over HTTP, so relative paths like `src="photo.png"` resolve correctly — including filenames with spaces. If images still don't appear, check: (1) the image files actually exist at the referenced path, (2) the paths are relative, not absolute filesystem paths like `/Users/name/photo.png`.
-- **Large presentations produce large PDFs.** Each slide is captured as a full 1920×1080 PNG screenshot. An 18-slide deck can produce a ~20MB PDF. If the PDF exceeds 10MB, ask the user: _"The PDF is [size]. Would you like me to compress it? It'll look slightly less sharp but the file will be much smaller."_ If yes, re-run the export with the `--compact` flag:
-  ```bash
-  bash scripts/export-pdf.sh <path-to-html> [output.pdf] --compact
-  ```
-  This renders at 1280×720 instead of 1920×1080, typically cutting file size by 50-70% with minimal visual difference.
+1. 删除 `.frontend-slides/slide-previews/` 和 `.frontend-slides/check/` 文件夹。
+2. 在浏览器中打开幻灯片：Windows 用 PowerShell 运行 `Start-Process "文件名.html"`，苹果电脑运行 `open "文件名.html"`。
+3. 用简短的中文告诉用户：
+   - 文件保存在哪里、用的什么风格、一共几页
+   - 怎么放映：方向键或空格翻页，按 F11 全屏
+   - 怎么修改：小改动按 E 键直接点文字修改，改动会暂存在这台电脑的浏览器里；按 Ctrl+S 会把改好的文件下载到“下载”文件夹，用它替换原文件。大的改动直接告诉 AI 改哪一页、怎么改
+   - 【待补充】清单：哪几页还缺哪些资料
+   - 需要发给别人时，可以导出 PDF
 
 ---
 
-## Supporting Files
+## 修改规则（修改已有幻灯片时）
 
-| File                                               | Purpose                                                              | When to Read              |
-| -------------------------------------------------- | -------------------------------------------------------------------- | ------------------------- |
-| [STYLE_PRESETS.md](STYLE_PRESETS.md)               | 12 curated visual presets with colors, fonts, and signature elements | Phase 2 (style selection) |
-| [bold-template-pack/selection-index.json](bold-template-pack/selection-index.json) | Compact bold template metadata for candidate selection | Phase 2 (style selection) |
-| [bold-template-pack/templates/*/preview.md](bold-template-pack/templates/) | Lightweight style cards for shortlisted bold title previews | Phase 2 after shortlisting |
-| [bold-template-pack/templates/*/design.md](bold-template-pack/templates/) | Detailed design-system docs for the selected bold template only | Phase 3 after user selection |
-| [viewport-base.css](viewport-base.css)             | Mandatory fixed-stage CSS — copy into every presentation             | Phase 3 (generation)      |
-| [html-template.md](html-template.md)               | HTML structure, JS features, code quality standards                  | Phase 3 (generation)      |
-| [animation-patterns.md](animation-patterns.md)     | CSS/JS animation snippets and effect-to-feeling guide                | Phase 3 (generation)      |
-| [scripts/extract-pptx.py](scripts/extract-pptx.py) | Python script for PPT content extraction                             | Phase 4 (conversion)      |
-| [scripts/deploy.sh](scripts/deploy.sh)             | Deploy slides to Vercel for instant sharing                          | Phase 6 (sharing)         |
-| [scripts/export-pdf.sh](scripts/export-pdf.sh)     | Export slides to PDF                                                 | Phase 6 (sharing)         |
+1. 加内容之前，先看这一页已经有多少内容。
+2. 要点超过上限，或者加图片后放不下，就拆成新的一页，并告诉用户拆了哪里。
+3. 每次修改后都运行第 5 步的检查。
+
+---
+
+## PPT 转换
+
+1. 提取内容：运行 `python <本技能文件夹>/scripts/extract-pptx.py <输入文件.pptx> <输出文件夹>`（苹果电脑用 `python3`）。缺少依赖时先运行 `python -m pip install python-pptx`。
+2. 把提取出的每页标题、内容概要和图片数量列给用户确认。
+3. 进入第 3 步选风格，再按第 4、5、6 步生成、检查和交付。保留原有的文字、图片、页面顺序；演讲者备注以 HTML 注释的形式保留在对应页面里。
+
+---
+
+## 导出 PDF（可选）
+
+```bash
+node <本技能文件夹>/scripts/slides.mjs pdf <幻灯片文件.html> [输出文件.pdf]
+```
+
+- PDF 的每一页是截图，文字不能再编辑，动画不保留。
+- 文件超过 10MB 时，询问用户是否压缩；同意的话加上 `--compact` 参数重新导出（分辨率从 1920×1080 降到 1280×720）。
+- 如果用户需要可编辑的 PowerPoint 文件：说明本技能输出的是网页幻灯片，可以另外请 AI 根据同样的内容制作 .pptx 文件。
+
+---
+
+## 固定画布规则（技术细节）
+
+- 每份幻灯片都有一个铺满窗口的外层容器，所有页面放在一个 1920×1080 的固定画布（`.deck-stage`）里。
+- 画布整体等比缩放适配窗口，可以留黑边，但**不能重新排版**；不要写针对手机的响应式断点。
+- 页面内部的尺寸都按 1920×1080 写死。`clamp()` 只用于画布以外的界面元素。
+- 页面的显示和隐藏只用 `viewport-base.css` 里的 `.active` / `.visible` 类（控制 `visibility`、`opacity`、`pointer-events`），不要用 `display: none / block` 切换页面，否则后面的布局样式可能让所有页面同时显示出来。
+- 保留 `prefers-reduced-motion` 支持。
+- 不要直接给 CSS 函数加负号（`-clamp()` 等会被浏览器忽略），改写成 `calc(-1 * clamp(...))`。
+
+---
+
+## 环境准备（首次使用时）
+
+- **检查版面和导出 PDF** 需要 Node.js 18 或以上版本。第一次使用前，在本技能文件夹里运行一次 `npm install`（安装 playwright-core，十几 MB）。网络慢或下载失败时改用国内镜像：`npm install --registry=https://registry.npmmirror.com`。
+- **浏览器**：脚本优先使用电脑自带的 Microsoft Edge 或 Google Chrome，不需要另外下载。两者都没有时，在本技能文件夹里运行 `npx playwright-core install chromium`。
+- **PPT 转换** 需要 Python 和 python-pptx。
+
+---
+
+## 配套文件
+
+| 文件 | 用途 | 什么时候读 |
+|---|---|---|
+| [BUSINESS_STYLES.md](BUSINESS_STYLES.md) | 可用的稳重风格、字体规则、字号下限 | 第 3 步和第 4 步 |
+| `bold-template-pack/templates/<风格>/preview.md` | 模板库风格的封面预览说明 | 第 3 步，只读入选的几套 |
+| `bold-template-pack/templates/<风格>/design.md` | 模板库风格的完整设计稿 | 第 4 步，只读用户选定的那一套 |
+| [viewport-base.css](viewport-base.css) | 固定画布样式，必须完整复制 | 第 4 步 |
+| [html-template.md](html-template.md) | 网页结构、翻页和编辑功能 | 第 4 步 |
+| [animation-patterns.md](animation-patterns.md) | 动画参考（只用克制的效果） | 第 4 步 |
+| [scripts/slides.mjs](scripts/slides.mjs) | 版面检查、导出 PDF | 第 5 步、导出 PDF |
+| [scripts/extract-pptx.py](scripts/extract-pptx.py) | 提取 PPT 内容 | PPT 转换 |

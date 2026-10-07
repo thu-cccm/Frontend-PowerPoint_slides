@@ -1,5 +1,7 @@
 # Animation Patterns Reference
 
+> **国企商务版说明**：只使用下表中 **Professional / Corporate** 和 **Calm / Minimal** 两行的效果，以及下面的淡入、上移、数字递增。不要使用粒子、霓虹发光、故障风文字、弹跳、视差、3D 倾斜等特效。动画时长控制在 0.6 秒以内，不要让听众等动画播完才能看到内容。
+
 Use this reference when generating presentations. Match animations to the intended feeling.
 
 ## Effect-to-Feeling Guide

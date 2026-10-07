@@ -1,5 +1,7 @@
 # Bold Template Pack
 
+> **国企商务版说明**：只使用 [BUSINESS_STYLES.md](../BUSINESS_STYLES.md) 中列出的几套模板（signal、blue-professional、cartesian），字体一律按该文件的字体规则改用本机字体，忽略各 design.md 中的 Google Fonts 链接。
+
 This pack brings the `beautiful-html-templates` design systems into the
 `frontend-slides` skill without making them the default for every deck.
 

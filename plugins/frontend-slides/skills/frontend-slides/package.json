@@ -1,0 +1,9 @@
+{
+  "name": "frontend-slides-cn-business",
+  "private": true,
+  "description": "版面检查和 PDF 导出所需的依赖。只需在技能文件夹里运行一次 npm install。",
+  "license": "MIT",
+  "dependencies": {
+    "playwright-core": "^1.56.0"
+  }
+}
