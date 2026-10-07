@@ -1,5 +1,7 @@
 # Style Presets Reference
 
+> **国企商务版说明**：本文件保留作原版参考，生成幻灯片时不再直接使用。可用风格以 [BUSINESS_STYLES.md](BUSINESS_STYLES.md) 为准，其中“简约红”和“黑白蓝”改编自本文件的 Swiss Modern 和 Electric Studio。本文件中的 Google Fonts 字体和“不用系统字体”的要求在国企商务版中不适用。
+
 Curated visual styles for Frontend Slides. Each preset is inspired by real design references — no generic "AI slop" aesthetics. **Abstract shapes only — no illustrations.**
 
 **Viewport CSS:** For mandatory base styles, see [viewport-base.css](viewport-base.css). Include in every presentation.

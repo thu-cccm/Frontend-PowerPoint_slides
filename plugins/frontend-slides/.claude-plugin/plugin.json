@@ -1,7 +1,7 @@
 {
   "name": "frontend-slides",
-  "version": "2.1.0",
-  "description": "Zero-dependency HTML presentation generator with safe presets, bold template-library styles, PPT conversion, and anti-AI-slop design philosophy.",
+  "version": "2.1.0-cn.1",
+  "description": "国企商务版：生成风格稳重、只用本机字体、可离线放映的网页幻灯片，也能把已有 PPT 转成网页幻灯片。",
   "skills": "./skills/",
   "author": {
     "name": "zqf",
@@ -10,5 +10,12 @@
   "homepage": "https://github.com/thu-cccm/Frontend-PowerPoint_slides",
   "repository": "https://github.com/thu-cccm/Frontend-PowerPoint_slides",
   "license": "MIT",
-  "keywords": ["presentations", "slides", "html", "design", "powerpoint", "animations", "templates"]
+  "keywords": [
+    "presentations",
+    "slides",
+    "html",
+    "powerpoint",
+    "chinese",
+    "business"
+  ]
 }

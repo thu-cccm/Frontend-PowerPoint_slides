@@ -1,480 +1,131 @@
-# Frontend Slides
+# Frontend Slides 国企商务版
 
-A coding-agent skill for creating stunning HTML presentations — from scratch or by converting PowerPoint files. It is packaged as a Claude Code plugin, and the core `SKILL.md` can also be read by other coding agents with filesystem and shell access.
+让 AI 帮你做**网页幻灯片**：一个 `.html` 文件，双击用浏览器打开，按方向键翻页，适合自己现场讲解。风格稳重，只用电脑自带的字体，在单位内网、断网的会议室里也能正常放映。
 
-## 📺 Watch the Walkthrough & Tutorial
+本版本由 Frontend Slides 原版改编，专门面向国企商务汇报场景。原版（风格更多、更有设计感）见本仓库的 `main` 分支。
 
-New here? This beginner-friendly video walks you through the whole thing, start to finish.
+---
 
-<a href="https://www.youtube.com/watch?v=372Iksaz8b0" title="Frontend Slides — walkthrough & tutorial (beginner-friendly)">
-  <img src="https://img.youtube.com/vi/372Iksaz8b0/maxresdefault.jpg" alt="Watch the Frontend Slides walkthrough and tutorial on YouTube" width="100%" />
-</a>
+## 和原版相比改了什么
 
-> ▶️ **[Watch on YouTube →](https://www.youtube.com/watch?v=372Iksaz8b0)** (beginner-friendly walkthrough and tutorial)
+| 项目 | 原版 | 国企商务版 |
+|---|---|---|
+| 说明书语言 | 英文 | 中文，方便自己阅读和修改 |
+| 风格 | 46 套，鼓励大胆、个性化的设计 | 5 套稳重风格：藏青金、商务蓝、简约红、黑白蓝、素雅灰 |
+| 字体 | 从 Google Fonts 在线加载 | 只用本机字体（微软雅黑、苹方等），不联网也能正常显示 |
+| 工作流程 | 直接出风格预览 | 先给大纲，确认后再设计页面 |
+| 数据 | 无特别要求 | 不编造数字和案例，缺资料时标出【待补充】 |
+| 一键发布到网上 | 有（Vercel） | 已删除，文件只留在自己电脑上 |
+| 版面检查和导出 PDF | bash 脚本，每次重新下载浏览器 | Node 脚本，Windows 也能用；直接用电脑自带的 Edge 或 Chrome |
+| 个人设置 | 无 | SKILL.md 开头有「我的偏好设置」，改一行字就能固定风格、单位名称、主色 |
 
-## What This Does
+---
 
-**Frontend Slides** helps non-designers create beautiful web presentations without knowing CSS or JavaScript. It uses a "show, don't tell" approach: instead of asking you to describe your aesthetic preferences in words, it generates visual previews and lets you pick what you like.
+## 安装到 Codex
 
-Here is a deck about the skill, made through the skill:
+### 方式一：手动复制（单位网络访问 GitHub 不稳定时推荐）
 
-https://github.com/user-attachments/assets/ef57333e-f879-432a-afb9-180388982478
+1. 下载本仓库本分支的压缩包并解压。
+2. 找到其中的 `plugins/frontend-slides/skills/frontend-slides` 文件夹。
+3. 把整个 `frontend-slides` 文件夹复制到 Codex 的个人技能目录：
+   - Windows：`C:\Users\你的用户名\.agents\skills\`
+   - 苹果电脑：`~/.agents/skills/`
+   - 较早版本的 Codex 使用 `.codex\skills`，如果上面的目录不生效，就放到这里
+4. 重启 Codex。
 
-### Key Features
+### 方式二：在 Codex 里让它自己安装
 
-- **Zero Dependencies** — Single HTML files with inline CSS/JS. No npm, no build tools, no frameworks.
-- **Visual Style Discovery** — Can't articulate design preferences? No problem. Pick from generated visual previews.
-- **PPT Conversion** — Convert existing PowerPoint files to web, preserving all images and content.
-- **Anti-AI-Slop** — Curated distinctive styles that avoid generic AI aesthetics (bye-bye, purple gradients on white).
-- **Bold Template Pack** — Optional design-forward templates from `beautiful-html-templates`, loaded progressively so safe presets still work as the default fallback.
-- **Production Quality** — Accessible, fixed 16:9, well-commented code you can customize.
-
-## Installation
-
-### Via Claude Code Custom Marketplace Source
-
-Install directly from this public GitHub repo. Run these as two separate Claude Code messages; do not paste both lines into the prompt at once.
-
-```text
-/plugin marketplace add https://github.com/thu-cccm/Frontend-PowerPoint_slides
-```
-
-After that finishes, run:
+在 Codex 中输入：
 
 ```text
-/plugin install frontend-slides@frontend-slides
+$skill-installer install https://github.com/thu-cccm/Frontend-PowerPoint_slides/tree/guoqi-business/plugins/frontend-slides/skills/frontend-slides
 ```
 
-Use the HTTPS URL. The shorter `thu-cccm/Frontend-PowerPoint_slides` form may make Claude Code try SSH, which can fail if GitHub is not already in your `known_hosts` file.
+安装完成后重启 Codex。（本分支合并进 `main` 之后，把链接里的 `guoqi-business` 换成 `main`。）
 
-Then use it by typing `/frontend-slides:frontend-slides` in Claude Code. Claude Code namespaces plugin-installed skills as `/plugin-name:skill-name`.
+### 首次准备（只需做一次）
 
-### Claude Code Manual Installation
-
-Copy the skill files to your Claude Code skills directory:
+版面检查和导出 PDF 需要 [Node.js](https://nodejs.org)（18 或以上版本）。在技能文件夹里打开终端，运行：
 
 ```bash
-# Create the skill directory
-mkdir -p ~/.claude/skills/frontend-slides/scripts
-
-# Copy the user-facing skill files
-cp SKILL.md STYLE_PRESETS.md viewport-base.css html-template.md animation-patterns.md ~/.claude/skills/frontend-slides/
-cp -R bold-template-pack ~/.claude/skills/frontend-slides/
-cp scripts/extract-pptx.py scripts/deploy.sh scripts/export-pdf.sh ~/.claude/skills/frontend-slides/scripts/
+npm install
 ```
 
-Or clone directly:
+网络较慢或下载失败时，改用国内镜像：
 
 ```bash
-git clone https://github.com/thu-cccm/Frontend-PowerPoint_slides.git ~/.claude/skills/frontend-slides
+npm install --registry=https://registry.npmmirror.com
 ```
 
-Then use it by typing `/frontend-slides` in Claude Code. Standalone skills are not namespaced.
+脚本会直接使用电脑自带的 Microsoft Edge 或 Google Chrome，不需要另外下载浏览器。Codex 运行检查脚本时会在后台打开浏览器，如果弹出权限请求，选择允许。
 
-### Other Coding Agents
+建议装好后先让 AI 做一份三四页的测试幻灯片，确认整个流程在这台电脑上能走通。
 
-Agents such as Codex, Kimi Code, OpenCode, Gemini CLI, or other local coding assistants can use the same core skill. The simplest path is to send the agent this GitHub repo link and ask it to use the Frontend Slides skill:
+---
+
+## 怎么用
+
+在 Codex 里直接说需求，例如：
 
 ```text
-https://github.com/thu-cccm/Frontend-PowerPoint_slides
+$frontend-slides 帮我做一份向客户介绍我们智慧园区解决方案的幻灯片，大约 10 页，资料在“方案资料”文件夹里
 ```
 
-If the agent can read GitHub repos or browse files, it should start from `SKILL.md` and load only the referenced support files it needs:
+不写 `$frontend-slides` 也可以，说“帮我做一份 PPT”时 Codex 一般会自动使用这个技能。
 
-- `STYLE_PRESETS.md`
-- `viewport-base.css`
-- `html-template.md`
-- `animation-patterns.md`
-- `bold-template-pack/`
-- `scripts/`
+AI 会按这个顺序工作：
 
-Some agents can also install the skill for you if they have filesystem access and a known local skills directory. If not, they can still follow `SKILL.md` directly for the current session.
+1. 一次问清楚：给谁讲、讲多久、素材在哪里
+2. 给出每一页的标题和要点（大纲），**等你确认**
+3. 给 3 个封面预览让你选风格（偏好设置里固定了风格就跳过）
+4. 生成幻灯片，自动检查版面并修正
+5. 打开幻灯片，告诉你还有哪些【待补充】的资料
 
-The Claude Code plugin gives Claude Code a custom marketplace-source install flow and `/frontend-slides:frontend-slides` command. Other agents usually do not use that command surface.
+### 放映和修改
 
-## Usage
+- 翻页：方向键或空格；全屏：F11
+- 小改动：按 E 键进入编辑，直接点文字修改；按 Ctrl+S 把改好的文件下载到“下载”文件夹，用它替换原文件
+- 大改动：直接告诉 AI“第 3 页改成……”
 
-### Create a New Presentation
+### 固定自己的习惯
+
+用记事本打开技能文件夹里的 `SKILL.md`，修改开头的「我的偏好设置」，例如：
 
 ```text
-/frontend-slides:frontend-slides
-
-> "I want to create a pitch deck for my AI startup"
+- **默认风格**：藏青金
+- **单位/部门名称**：××公司大客户部
+- **单位主色**：#C00000
 ```
 
-If installed manually as a standalone Claude Code skill, use `/frontend-slides` instead.
+保存后，下次做幻灯片就会自动按这些设置来，不再重复询问。
 
-In non-Claude agents, ask the agent to use the Frontend Slides skill and point it at this repo or `SKILL.md`.
+### 检查版面、导出 PDF
 
-The skill will:
+AI 会自动运行这两个命令，也可以自己在幻灯片所在的文件夹里打开终端运行（把 `<技能文件夹>` 换成实际路径）：
 
-1. Ask about your content (slides, messages, images)
-2. Generate 3 visual style previews for you to compare, inferring the vibe from your brief unless you already named one
-3. Let you pick the visual direction
-4. Create the full presentation in your chosen style
-5. Open it in your browser
+```bash
+# 逐页截图并检查文字溢出、重叠、字号过小、外网资源等问题
+node <技能文件夹>/scripts/slides.mjs check 客户方案汇报.html
 
-### Convert a PowerPoint
-
-```text
-/frontend-slides:frontend-slides
-
-> "Convert my presentation.pptx to a web slideshow"
+# 导出 PDF（每页是图片，文字不能编辑；加 --compact 体积更小）
+node <技能文件夹>/scripts/slides.mjs pdf 客户方案汇报.html
 ```
 
-The skill will:
+---
 
-1. Extract all text, images, and notes from your PPT
-2. Show you the extracted content for confirmation
-3. Let you pick a visual style
-4. Generate an HTML presentation with all your original assets
+## 五套风格
 
-## Included Styles
+| 风格 | 适合场景 |
+|---|---|
+| 藏青金 | 向领导汇报、正式提案 |
+| 商务蓝 | 方案介绍、数据较多的汇报 |
+| 简约红 | 国企常用红色强调，简洁有力 |
+| 黑白蓝 | 对比度最高，投影仪效果差时最清晰 |
+| 素雅灰 | 低调克制，咨询报告、研究汇报 |
 
-### Dark Themes
+藏青金、商务蓝、素雅灰改编自模板库中的 Signal、Blue Professional、Cartesian（下图为原版效果，国企商务版换成了本机字体）：
 
-- **Bold Signal** — Confident, high-impact, vibrant card on dark
-- **Electric Studio** — Clean, professional, split-panel
-- **Creative Voltage** — Energetic, retro-modern, electric blue + neon
-- **Dark Botanical** — Elegant, sophisticated, warm accents
-
-### Light Themes
-
-- **Notebook Tabs** — Editorial, organized, paper with colorful tabs
-- **Pastel Geometry** — Friendly, approachable, vertical pills
-- **Split Pastel** — Playful, modern, two-color vertical split
-- **Vintage Editorial** — Witty, personality-driven, geometric shapes
-
-### Specialty
-
-- **Neon Cyber** — Futuristic, particle backgrounds, neon glow
-- **Terminal Green** — Developer-focused, hacker aesthetic
-- **Swiss Modern** — Minimal, Bauhaus-inspired, geometric
-- **Paper & Ink** — Literary, drop caps, pull quotes
-
-### Bold Template Pack
-
-The skill also includes 34 optional bold design systems from
-`beautiful-html-templates`, such as **Neo-Grid Bold**, **Editorial Tri-Tone**,
-**Creative Mode**, **Broadside**, **Signal**, and **Vellum**.
-
-During style discovery, the preview set is:
-
-- 1 safe preset from `STYLE_PRESETS.md`
-- at least 1 bold template option from `bold-template-pack/selection-index.json`
-- 1 wildcard option, either another bold template or a self-generated custom design
-
-The agent reads the compact bold template index first, then loads only the
-shortlisted candidates' small `preview.md` cards for title-slide previews. It
-loads the full `design.md` for exactly one bold template only after the user
-picks that template for the final deck. If the user picks a custom wildcard,
-the agent expands that preview's own CSS and layout system into the full deck.
-
-## Bold Template Gallery
-
-Frontend Slides can now draw from the 34 bold design systems in [`beautiful-html-templates`](https://github.com/zarazhangrui/beautiful-html-templates). Three screenshots per template show how each visual system handles different slide layouts. Click any template name to inspect the source template library.
-
-### [Soft Editorial](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/soft-editorial/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/soft-editorial-4.png" width="32.5%" alt="Soft Editorial — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/soft-editorial-6.png" width="32.5%" alt="Soft Editorial — slide 6" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/soft-editorial-10.png" width="32.5%" alt="Soft Editorial — slide 10" />
-</p>
-
-> Cormorant Garamond serif on warm paper with sage, blush, and lemon accents.
-
-### [Editorial Forest](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/editorial-forest/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-forest-1.png" width="32.5%" alt="Editorial Forest — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-forest-2.png" width="32.5%" alt="Editorial Forest — slide 2" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-forest-5.png" width="32.5%" alt="Editorial Forest — slide 5" />
-</p>
-
-> Forest green, dusty pink, and warm cream in Source Serif 4 — quiet, intentional quarterly-review aesthetic.
-
-### [Pin & Paper](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/pin-and-paper/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pin-and-paper-1.png" width="32.5%" alt="Pin & Paper — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pin-and-paper-11.png" width="32.5%" alt="Pin & Paper — slide 11" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pin-and-paper-3.png" width="32.5%" alt="Pin & Paper — slide 3" />
-</p>
-
-> Yellow paper with safety-pin illustrations, ink-blue handwritten Caveat, paper-grain texture.
-
-### [Sakura Chroma](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/sakura-chroma/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/sakura-chroma-1.png" width="32.5%" alt="Sakura Chroma — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/sakura-chroma-3.png" width="32.5%" alt="Sakura Chroma — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/sakura-chroma-4.png" width="32.5%" alt="Sakura Chroma — slide 4" />
-</p>
-
-> Vintage Japanese cassette-package aesthetic: cream paper, diagonal rainbow ribbons, condensed bold type, JIS-style spec checkboxes.
-
-### [Stencil & Tablet](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/stencil-tablet/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/stencil-tablet-1.png" width="32.5%" alt="Stencil & Tablet — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/stencil-tablet-3.png" width="32.5%" alt="Stencil & Tablet — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/stencil-tablet-8.png" width="32.5%" alt="Stencil & Tablet — slide 8" />
-</p>
-
-> Bone paper with stencil-cut headlines and a six-color earth palette: archaeology meets brand.
-
-### [Cobalt Grid](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/cobalt-grid/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cobalt-grid-1.png" width="32.5%" alt="Cobalt Grid — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cobalt-grid-3.png" width="32.5%" alt="Cobalt Grid — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cobalt-grid-5.png" width="32.5%" alt="Cobalt Grid — slide 5" />
-</p>
-
-> Electric cobalt italic serifs on a graph-paper canvas, anchored by stair-stepped pixel-glitch decorations and slim hairline rules.
-
-### [Vellum](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/vellum/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/vellum-1.png" width="32.5%" alt="Vellum — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/vellum-4.png" width="32.5%" alt="Vellum — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/vellum-8.png" width="32.5%" alt="Vellum — slide 8" />
-</p>
-
-> Deep navy canvas with warm-yellow italic Cormorant serifs and a single dusty teal accent. A quiet, scholarly aesthetic.
-
-### [Emerald Editorial](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/emerald-editorial/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/emerald-editorial-1.png" width="32.5%" alt="Emerald Editorial — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/emerald-editorial-3.png" width="32.5%" alt="Emerald Editorial — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/emerald-editorial-6.png" width="32.5%" alt="Emerald Editorial — slide 6" />
-</p>
-
-> Magazine-cover business deck: emerald + navy + paper with double-rule masthead ornaments and a heavy Bodoni-style display serif.
-
-### [Neo-Grid Bold](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/neo-grid-bold/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/neo-grid-bold-1.png" width="32.5%" alt="Neo-Grid Bold — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/neo-grid-bold-3.png" width="32.5%" alt="Neo-Grid Bold — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/neo-grid-bold-8.png" width="32.5%" alt="Neo-Grid Bold — slide 8" />
-</p>
-
-> Editorial neo-brutalism with a single neon yellow accent on off-white paper.
-
-### [Editorial Tri-Tone](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/editorial-tri-tone/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-tri-tone-1.png" width="32.5%" alt="Editorial Tri-Tone — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-tri-tone-4.png" width="32.5%" alt="Editorial Tri-Tone — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/editorial-tri-tone-3.png" width="32.5%" alt="Editorial Tri-Tone — slide 3" />
-</p>
-
-> Three-color editorial system: dusty pink, mustard cream, and deep burgundy, set in Bricolage + Instrument Serif.
-
-### [Creative Mode](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/creative-mode/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/creative-mode-1.png" width="32.5%" alt="Creative Mode — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/creative-mode-4.png" width="32.5%" alt="Creative Mode — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/creative-mode-6.png" width="32.5%" alt="Creative Mode — slide 6" />
-</p>
-
-> Cream paper canvas with confident multi-color (green, pink, orange, yellow) accents and Archivo Black display.
-
-### [Monochrome](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/monochrome/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/monochrome-1.png" width="32.5%" alt="Monochrome — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/monochrome-4.png" width="32.5%" alt="Monochrome — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/monochrome-12.png" width="32.5%" alt="Monochrome — slide 12" />
-</p>
-
-> Ivory ledger paper with all-black type; Lora serif headlines, Jost body, no color at all.
-
-### [People's Platform (Block & Bold)](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/peoples-platform/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/peoples-platform-1.png" width="32.5%" alt="People's Platform (Block & Bold) — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/peoples-platform-4.png" width="32.5%" alt="People's Platform (Block & Bold) — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/peoples-platform-8.png" width="32.5%" alt="People's Platform (Block & Bold) — slide 8" />
-</p>
-
-> Activist poster energy: blue, orange, red on cream, with Alfa Slab + Caveat Brush.
-
-### [Pink Script — After Hours](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/pink-script/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pink-script-1.png" width="32.5%" alt="Pink Script — After Hours — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pink-script-4.png" width="32.5%" alt="Pink Script — After Hours — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/pink-script-8.png" width="32.5%" alt="Pink Script — After Hours — slide 8" />
-</p>
-
-> Black canvas, hot pink accent, pearl-cream paper, Instrument Serif headlines: late-night editorial luxury.
-
-### [8-Bit Orbit](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/8-bit-orbit/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/8-bit-orbit-1.png" width="32.5%" alt="8-Bit Orbit — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/8-bit-orbit-6.png" width="32.5%" alt="8-Bit Orbit — slide 6" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/8-bit-orbit-5.png" width="32.5%" alt="8-Bit Orbit — slide 5" />
-</p>
-
-> Pixel-art neon arcade aesthetic on a deep navy void.
-
-### [BlockFrame](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/block-frame/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/block-frame-1.png" width="32.5%" alt="BlockFrame — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/block-frame-4.png" width="32.5%" alt="BlockFrame — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/block-frame-8.png" width="32.5%" alt="BlockFrame — slide 8" />
-</p>
-
-> Neobrutalist deck with pastel-neon color blocks and chunky black borders.
-
-### [Blue Professional](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/blue-professional/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-1.png" width="32.5%" alt="Blue Professional — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-6.png" width="32.5%" alt="Blue Professional — slide 6" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-8.png" width="32.5%" alt="Blue Professional — slide 8" />
-</p>
-
-> Cream paper background with electric cobalt blue accents; clean modern professional.
-
-### [Bold Poster](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/bold-poster/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/bold-poster-1.png" width="32.5%" alt="Bold Poster — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/bold-poster-4.png" width="32.5%" alt="Bold Poster — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/bold-poster-8.png" width="32.5%" alt="Bold Poster — slide 8" />
-</p>
-
-> Editorial poster aesthetic with massive Shrikhand display and a single fire-engine red accent.
-
-### [Broadside](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/broadside/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/broadside-1.png" width="32.5%" alt="Broadside — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/broadside-4.png" width="32.5%" alt="Broadside — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/broadside-13.png" width="32.5%" alt="Broadside — slide 13" />
-</p>
-
-> Dark editorial canvas with a single fire orange accent and bilingual Latin/Chinese type stack.
-
-### [Capsule](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/capsule/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/capsule-1.png" width="32.5%" alt="Capsule — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/capsule-4.png" width="32.5%" alt="Capsule — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/capsule-8.png" width="32.5%" alt="Capsule — slide 8" />
-</p>
-
-> Modular pill-shaped cards on warm bone with a full pastel-pop palette.
-
-### [Cartesian](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/cartesian/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-1.png" width="32.5%" alt="Cartesian — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-4.png" width="32.5%" alt="Cartesian — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-8.png" width="32.5%" alt="Cartesian — slide 8" />
-</p>
-
-> Quiet warm-neutral palette with classical Playfair serifs; tasteful and unhurried.
-
-### [Coral](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/coral/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/coral-1.png" width="32.5%" alt="Coral — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/coral-4.png" width="32.5%" alt="Coral — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/coral-8.png" width="32.5%" alt="Coral — slide 8" />
-</p>
-
-> Cream and coral on near-black, set in oversized Bebas Neue.
-
-### [Daisy Days](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/daisy-days/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/daisy-days-1.png" width="32.5%" alt="Daisy Days — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/daisy-days-4.png" width="32.5%" alt="Daisy Days — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/daisy-days-8.png" width="32.5%" alt="Daisy Days — slide 8" />
-</p>
-
-> Cheerful pastel deck with hand-drawn daisies, stars, and rainbows. Friendly, soft, and warm.
-
-### [Grove](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/grove/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/grove-1.png" width="32.5%" alt="Grove — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/grove-4.png" width="32.5%" alt="Grove — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/grove-8.png" width="32.5%" alt="Grove — slide 8" />
-</p>
-
-> Forest-green canvas with cream type, classical Playfair serifs, and a single rust accent.
-
-### [Mat](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/mat/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/mat-1.png" width="32.5%" alt="Mat — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/mat-4.png" width="32.5%" alt="Mat — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/mat-8.png" width="32.5%" alt="Mat — slide 8" />
-</p>
-
-> Dark sage canvas with bone paper and burnt-orange accent; mid-century modern with wood undertones.
-
-### [Playful](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/playful/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/playful-1.png" width="32.5%" alt="Playful — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/playful-6.png" width="32.5%" alt="Playful — slide 6" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/playful-8.png" width="32.5%" alt="Playful — slide 8" />
-</p>
-
-> Sun-warm peach background with Syne display: a friendly indie launch deck.
-
-### [Raw Grid](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/raw-grid/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/raw-grid-1.png" width="32.5%" alt="Raw Grid — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/raw-grid-4.png" width="32.5%" alt="Raw Grid — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/raw-grid-8.png" width="32.5%" alt="Raw Grid — slide 8" />
-</p>
-
-> Neo-brutalist deck with thick borders, offset shadows, and a pink/sage/ink palette.
-
-### [Retro Windows](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/retro-windows/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-windows-1.png" width="32.5%" alt="Retro Windows — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-windows-4.png" width="32.5%" alt="Retro Windows — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-windows-8.png" width="32.5%" alt="Retro Windows — slide 8" />
-</p>
-
-> Windows 95 chrome: gray title bars, MS Sans Serif, pixel typography, full nostalgia.
-
-### [Retro Zine](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/retro-zine/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-zine-1.png" width="32.5%" alt="Retro Zine — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-zine-4.png" width="32.5%" alt="Retro Zine — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/retro-zine-8.png" width="32.5%" alt="Retro Zine — slide 8" />
-</p>
-
-> Beige paper with green accent and Bebas Neue + Caveat: a riso-printed zine in HTML form.
-
-### [Scatterbrain](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/scatterbrain/)
-
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/scatterbrain-1.png" width="32.5%" alt="Scatterbrain — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/scatterbrain-4.png" width="32.5%" alt="Scatterbrain — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/scatterbrain-8.png" width="32.5%" alt="Scatterbrain — slide 8" />
-</p>
-
-> Post-it inspired: pastel sticky notes, Caveat handwriting, Shrikhand and Zilla Slab type stack.
-
-### [Signal](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/signal/)
+**藏青金（Signal）**
 
 <p>
   <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/signal-1.png" width="32.5%" alt="Signal — slide 1" />
@@ -482,113 +133,47 @@ Frontend Slides can now draw from the 34 bold design systems in [`beautiful-html
   <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/signal-8.png" width="32.5%" alt="Signal — slide 8" />
 </p>
 
-> Deep navy canvas with bone paper and a single muted-gold accent; institutional with quiet weight.
-
-### [Studio](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/studio/)
+**商务蓝（Blue Professional）**
 
 <p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/studio-1.png" width="32.5%" alt="Studio — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/studio-4.png" width="32.5%" alt="Studio — slide 4" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/studio-8.png" width="32.5%" alt="Studio — slide 8" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-1.png" width="32.5%" alt="Blue Professional — slide 1" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-6.png" width="32.5%" alt="Blue Professional — slide 6" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/blue-professional-8.png" width="32.5%" alt="Blue Professional — slide 8" />
 </p>
 
-> Black canvas with electric-yellow type; high-voltage design studio aesthetic.
-
-### [Biennale Yellow](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/biennale-yellow/)
+**素雅灰（Cartesian）**
 
 <p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/biennale-yellow-1.png" width="32.5%" alt="Biennale Yellow — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/biennale-yellow-5.png" width="32.5%" alt="Biennale Yellow — slide 5" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/biennale-yellow-8.png" width="32.5%" alt="Biennale Yellow — slide 8" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-1.png" width="32.5%" alt="Cartesian — slide 1" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-4.png" width="32.5%" alt="Cartesian — slide 4" />
+  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/cartesian-8.png" width="32.5%" alt="Cartesian — slide 8" />
 </p>
 
-> Solar yellow on warm parchment with deep indigo serif and atmospheric sun-glow gradients. Dutch-editorial poster energy.
+想加入模板库里的其他风格，按 `BUSINESS_STYLES.md` 末尾的「如何新增一套风格」操作。
 
-### [Long Table](https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/long-table/)
+---
 
-<p>
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/long-table-1.png" width="32.5%" alt="Long Table — slide 1" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/long-table-3.png" width="32.5%" alt="Long Table — slide 3" />
-  <img src="https://raw.githubusercontent.com/zarazhangrui/beautiful-html-templates/main/screenshots/long-table-7.png" width="32.5%" alt="Long Table — slide 7" />
-</p>
+## 文件说明
 
-> Warm cream and rust-red supper-club aesthetic with bold uppercase grotesk headlines, italic Fraunces, and pill-shaped outlined buttons.
+| 文件 | 作用 |
+|---|---|
+| `SKILL.md` | 技能说明书：工作流程、规则、偏好设置 |
+| `BUSINESS_STYLES.md` | 五套稳重风格、字体规则、投屏字号下限 |
+| `html-template.md` | 网页幻灯片的结构、翻页和编辑功能 |
+| `viewport-base.css` | 固定 16:9 画布的基础样式 |
+| `animation-patterns.md` | 动画参考（只用克制的效果） |
+| `bold-template-pack/` | 模板库（只用其中三套） |
+| `scripts/slides.mjs` | 版面检查、导出 PDF |
+| `scripts/extract-pptx.py` | 把已有 PPT 的内容提取出来，用于转换 |
 
-## Architecture
+## 环境要求
 
-This skill uses **progressive disclosure** — the main `SKILL.md` is a workflow map, with supporting files loaded on-demand only when needed:
+- Codex（或其他能读写文件、运行命令的 AI 编程助手）
+- 版面检查和导出 PDF：Node.js 18+，以及 Microsoft Edge 或 Google Chrome
+- PPT 转换：Python 和 python-pptx（`python -m pip install python-pptx`）
 
-| File                      | Purpose                        | Loaded When               |
-| ------------------------- | ------------------------------ | ------------------------- |
-| `SKILL.md`                | Core workflow and rules        | Always (skill invocation) |
-| `STYLE_PRESETS.md`        | 12 curated visual presets      | Phase 2 (style selection) |
-| `bold-template-pack/selection-index.json` | Compact bold template metadata for candidate selection | Phase 2 (style selection) |
-| `bold-template-pack/templates/*/preview.md` | Tiny style cards for shortlisted bold previews | Phase 2 after shortlisting |
-| `bold-template-pack/templates/*/design.md` | Full design system for the selected bold template | Phase 3 after user selection |
-| `viewport-base.css`       | Mandatory fixed-stage CSS      | Phase 3 (generation)      |
-| `html-template.md`        | HTML structure and JS features | Phase 3 (generation)      |
-| `animation-patterns.md`   | CSS/JS animation reference     | Phase 3 (generation)      |
-| `scripts/extract-pptx.py` | PPT content extraction         | Phase 4 (conversion)      |
-| `scripts/deploy.sh`       | Deploy to Vercel               | Phase 6 (sharing)         |
-| `scripts/export-pdf.sh`   | Export slides to PDF           | Phase 6 (sharing)         |
+## 致谢与许可
 
-Maintenance-only source metadata and regeneration helpers live outside the
-user-facing skill package. Normal users do not need them.
-
-This design follows agent-skill best practices: give the agent a map first,
-then reveal only the specific files needed for the current choice.
-
-## Philosophy
-
-This skill was born from the belief that:
-
-1. **You don't need to be a designer to make beautiful things.** You just need to react to what you see.
-
-2. **Dependencies are debt.** A single HTML file will work in 10 years. A React project from 2019? Good luck.
-
-3. **Generic is forgettable.** Every presentation should feel custom-crafted, not template-generated.
-
-4. **Comments are kindness.** Code should explain itself to future-you (or anyone else who opens it).
-
-## Sharing Your Presentations
-
-After creating a presentation, the skill offers two ways to share it:
-
-### Deploy to a Live URL
-
-One command deploys your slides to a permanent, shareable URL that works on any device — phones, tablets, laptops:
-
-```bash
-bash scripts/deploy.sh ./my-deck/
-# or
-bash scripts/deploy.sh ./presentation.html
-```
-
-Uses [Vercel](https://vercel.com) (free tier). The skill walks you through signup and login if it's your first time.
-
-### Export to PDF
-
-Convert your slides to a PDF for email, Slack, Notion, or printing:
-
-```bash
-bash scripts/export-pdf.sh ./my-deck/index.html
-bash scripts/export-pdf.sh ./presentation.html ./output.pdf
-```
-
-Uses [Playwright](https://playwright.dev) to screenshot each slide at 1920×1080 and combine into a PDF. Installs automatically if needed. Animations are not preserved (it's a static snapshot).
-
-## Requirements
-
-- A local coding agent with filesystem access and the ability to run shell commands
-- Claude Code is required only for the custom marketplace-source install and `/frontend-slides:frontend-slides` command
-- For PPT conversion: Python with `python-pptx` library
-- For URL deployment: Node.js + Vercel account (free)
-- For PDF export: Node.js (Playwright installs automatically)
-
-## Credits
-
-Created by [@zqf](https://github.com/thu-cccm).
-
-## License
-
-MIT — Use it, modify it, share it.
+- 原版 Frontend Slides，Created by [@zqf](https://github.com/thu-cccm)
+- 模板库来自 [beautiful-html-templates](https://github.com/zarazhangrui/beautiful-html-templates)
+- MIT 许可，可自由使用、修改和分享
